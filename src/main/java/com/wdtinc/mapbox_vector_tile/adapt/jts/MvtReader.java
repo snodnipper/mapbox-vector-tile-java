@@ -145,6 +145,69 @@ public final class MvtReader {
         return tileGeoms;
     }
 
+    /**
+     *
+     * @param is
+     * @param geomFactory
+     * @param tagConverter
+     * @param ringClassifier
+     * @return layers
+
+     */
+    /**
+     * Load an MVT into a LayerGroup, where each layer contains the appropriate geometry.
+     * Uses {@code tagConverter} to create user data from feature properties.
+     *
+     * @param is stream with MVT data
+     * @param geomFactory allows for JTS geometry creation
+     * @param tagConverter converts MVT feature tags to JTS user data object.
+     * @param ringClassifier determines how rings are parsed into Polygons and MultiPolygons
+     * @return LayerGroup, containing Layers and then JTS geometries, which use MVT coordinates
+     * @throws IOException failure reading MVT from stream
+     * @see Geometry
+     * @see Geometry#getUserData()
+     * @see RingClassifier
+     * @throws IOException if there is a failure to parse from the {@code is}
+     */
+    public static LayerGroup loadMvtWithLayers(InputStream is,
+                                               GeometryFactory geomFactory,
+                                               ITagConverter tagConverter,
+                                               RingClassifier ringClassifier) throws IOException {
+        LayerGroup layerGroup = new LayerGroup();
+
+        final VectorTile.Tile mvt = VectorTile.Tile.parseFrom(is);
+        final Vec2d cursor = new Vec2d();
+
+        for(VectorTile.Tile.Layer nextLayer : mvt.getLayersList()) {
+            Layer layer = new Layer(nextLayer.getName());
+            layerGroup.addLayer(layer);
+
+            final ProtocolStringList keysList = nextLayer.getKeysList();
+            final List<VectorTile.Tile.Value> valuesList = nextLayer.getValuesList();
+
+            for (VectorTile.Tile.Feature nextFeature : nextLayer.getFeaturesList()) {
+
+                final Long id = nextFeature.hasId() ? nextFeature.getId() : null;
+
+                final VectorTile.Tile.GeomType geomType = nextFeature.getType();
+
+                if(geomType == VectorTile.Tile.GeomType.UNKNOWN) {
+                    continue;
+                }
+
+                final List<Integer> geomCmds = nextFeature.getGeometryList();
+                cursor.set(0d, 0d);
+                final Geometry nextGeom = readGeometry(geomCmds, geomType, geomFactory, cursor, ringClassifier);
+                if(nextGeom != null) {
+                    layer.add(nextGeom);
+                    nextGeom.setUserData(tagConverter.toUserData(id, nextFeature.getTagsList(), keysList, valuesList));
+                }
+            }
+        }
+
+        return layerGroup;
+    }
+
     private static Geometry readGeometry(List<Integer> geomCmds,
                                          VectorTile.Tile.GeomType geomType,
                                          GeometryFactory geomFactory,
