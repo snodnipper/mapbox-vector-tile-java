@@ -82,7 +82,7 @@ public final class MvtEncoderTest {
         }
 
         private static Collection<Geometry> getPoints(Point... points) {
-            return asList(points);
+            return Arrays.<Geometry>asList(points);
         }
 
         private static Point createPoint(String name) {

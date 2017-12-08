@@ -35,7 +35,12 @@ public final class MvtBuildTest {
     private static final double WORLD_SIZE = 100D;
 
     /** Do not filter tile geometry */
-    private static final IGeometryFilter ACCEPT_ALL_FILTER = geometry -> true;
+    private static final IGeometryFilter ACCEPT_ALL_FILTER = new IGeometryFilter() {
+        @Override
+        public boolean accept(Geometry geometry) {
+            return true;
+        }
+    };
 
     /** Default MVT parameters */
     private static final MvtLayerParams DEFAULT_MVT_PARAMS = new MvtLayerParams();
@@ -215,11 +220,11 @@ public final class MvtBuildTest {
         assertNotNull(layers.getLayer(layer2Name));
 
         Collection<Geometry> actualLayer1Geometries = layers.getLayer(layer1Name).getGeometries();
-        Collection<Geometry> expectedLayer1Geometries = Arrays.asList(point1, point2);
+        Collection<Geometry> expectedLayer1Geometries = Arrays.<Geometry>asList(point1, point2);
         assertEquals(expectedLayer1Geometries, actualLayer1Geometries);
 
         Collection<Geometry> actualLayer2Geometries = layers.getLayer(layer2Name).getGeometries();
-        Collection<Geometry> expectedLayer2Geometries = Arrays.asList(point3);
+        Collection<Geometry> expectedLayer2Geometries = Arrays.<Geometry>asList(point3);
         assertEquals(expectedLayer2Geometries, actualLayer2Geometries);
     }
 
@@ -350,7 +355,7 @@ public final class MvtBuildTest {
             private List<Geometry> getActiveLayer() {
                 boolean isDefined = layers.containsKey(activeLayer);
                 if (!isDefined) {
-                    layers.put(activeLayer, new ArrayList<>());
+                    layers.put(activeLayer, new ArrayList<Geometry>());
                 }
                 return layers.get(activeLayer);
             }

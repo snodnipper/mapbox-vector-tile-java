@@ -22,7 +22,7 @@ public class JtsLayer {
      * @throws IllegalArgumentException when {@code name} is null
      */
     public JtsLayer(String name) {
-        this(name, new ArrayList<>(0));
+        this(name, new ArrayList<Geometry>(0));
     }
 
     /**

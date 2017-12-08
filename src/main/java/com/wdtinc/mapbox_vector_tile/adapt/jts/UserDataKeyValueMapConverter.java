@@ -42,13 +42,14 @@ public final class UserDataKeyValueMapConverter implements IUserDataConverter {
     }
 
     @Override
-    public void addTags(Object userData, MvtLayerProps layerProps, VectorTile.Tile.Feature.Builder featureBuilder) {
+    public void addTags(Object userData, MvtLayerProps layerProps,
+                        VectorTile.Tile.Feature.Builder featureBuilder) {
         if(userData != null) {
             try {
                 @SuppressWarnings("unchecked")
                 final Map<String, Object> userDataMap = (Map<String, Object>)userData;
 
-                userDataMap.entrySet().stream().forEach(e -> {
+                for (Map.Entry<String, Object> e : userDataMap.entrySet()) {
                     final String key = e.getKey();
                     final Object value = e.getValue();
 
@@ -60,7 +61,7 @@ public final class UserDataKeyValueMapConverter implements IUserDataConverter {
                             featureBuilder.addTags(valueIndex);
                         }
                     }
-                });
+                }
 
                 // Set feature id value
                 if(setId) {
@@ -79,7 +80,8 @@ public final class UserDataKeyValueMapConverter implements IUserDataConverter {
                 }
 
             } catch (ClassCastException e) {
-                LoggerFactory.getLogger(UserDataKeyValueMapConverter.class).error(e.getMessage(), e);
+                LoggerFactory.getLogger(UserDataKeyValueMapConverter.class).error(e.getMessage(),
+                    e);
             }
         }
     }
