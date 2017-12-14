@@ -6,9 +6,6 @@ import com.wdtinc.mapbox_vector_tile.VectorTile;
 import com.wdtinc.mapbox_vector_tile.adapt.jts.*;
 import com.wdtinc.mapbox_vector_tile.adapt.jts.model.JtsLayer;
 import com.wdtinc.mapbox_vector_tile.adapt.jts.model.JtsMvt;
-import com.wdtinc.mapbox_vector_tile.build.MvtLayerBuild;
-import com.wdtinc.mapbox_vector_tile.build.MvtLayerParams;
-import com.wdtinc.mapbox_vector_tile.build.MvtLayerProps;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -25,27 +22,34 @@ public final class MvtBuildTest {
 
     private static String TEST_LAYER_NAME = "layerNameHere";
 
-    /** Fixed randomization with arbitrary seed value */
+    /**
+     * Fixed randomization with arbitrary seed value.
+     */
     private static final long SEED = 487125064L;
 
-    /** Fixed random */
+    /**
+     * Fixed random.
+     */
     private static final Random RANDOM = new Random(SEED);
 
-    /** Example world is 100x100 box */
+    /**
+     * Example world is 100x100 box.
+     */
     private static final double WORLD_SIZE = 100D;
 
-    /** Do not filter tile geometry */
-    private static final IGeometryFilter ACCEPT_ALL_FILTER = new IGeometryFilter() {
-        @Override
-        public boolean accept(Geometry geometry) {
-            return true;
-        }
-    };
+    /**
+     * Do not filter tile geometry.
+     */
+    private static final IGeometryFilter ACCEPT_ALL_FILTER = geometry -> true;
 
-    /** Default MVT parameters */
+    /**
+     * Default MVT parameters.
+     */
     private static final MvtLayerParams DEFAULT_MVT_PARAMS = new MvtLayerParams();
 
-    /** Generate Geometries with this default specification */
+    /**
+     * Generate Geometries with this default specification.
+     */
     private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
 
     @Test
@@ -220,11 +224,11 @@ public final class MvtBuildTest {
         assertNotNull(layers.getLayer(layer2Name));
 
         Collection<Geometry> actualLayer1Geometries = layers.getLayer(layer1Name).getGeometries();
-        Collection<Geometry> expectedLayer1Geometries = Arrays.<Geometry>asList(point1, point2);
+        Collection<Geometry> expectedLayer1Geometries = Arrays.asList(point1, point2);
         assertEquals(expectedLayer1Geometries, actualLayer1Geometries);
 
         Collection<Geometry> actualLayer2Geometries = layers.getLayer(layer2Name).getGeometries();
-        Collection<Geometry> expectedLayer2Geometries = Arrays.<Geometry>asList(point3);
+        Collection<Geometry> expectedLayer2Geometries = Arrays.asList(point3);
         assertEquals(expectedLayer2Geometries, actualLayer2Geometries);
     }
 
@@ -249,8 +253,7 @@ public final class MvtBuildTest {
     }
 
     private Point createPoint() {
-        Coordinate coord = new Coordinate( (int) (RANDOM.nextDouble() * 4095),
-                (int) (RANDOM.nextDouble() * 4095));
+        Coordinate coord = new Coordinate(RANDOM.nextInt(4096), RANDOM.nextInt(4096));
         Point point = GEOMETRY_FACTORY.createPoint(coord);
 
         Map<String, Object> attributes = new LinkedHashMap<>();
@@ -355,7 +358,7 @@ public final class MvtBuildTest {
             private List<Geometry> getActiveLayer() {
                 boolean isDefined = layers.containsKey(activeLayer);
                 if (!isDefined) {
-                    layers.put(activeLayer, new ArrayList<Geometry>());
+                    layers.put(activeLayer, new ArrayList<>());
                 }
                 return layers.get(activeLayer);
             }

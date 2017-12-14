@@ -63,7 +63,7 @@ public final class JtsLayerTest {
 
         Point point = createPoint(new int[]{50, 0});
         Point point2 = createPoint(new int[]{51, 1});
-        Collection<Geometry> points = Arrays.<Geometry>asList(point, point2);
+        Collection<Geometry> points = Arrays.asList(point, point2);
 
         JtsLayer layer = new JtsLayer(layerName, geometries);
         layer.getGeometries().addAll(points);
